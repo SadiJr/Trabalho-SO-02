@@ -16,7 +16,12 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
+import controll.Ctrl;
+
 public class Game extends JPanel {
+	JFrame frame;
+	JPanel table = new JPanel();
+	JPanel click = new JPanel();
 
 	public Game() {
 		EventQueue.invokeLater(new Runnable() {
@@ -28,19 +33,19 @@ public class Game extends JPanel {
 						| UnsupportedLookAndFeelException ex) {
 				}
 
-				JFrame frame = new JFrame("Testing");
+				frame = new JFrame("Testing");
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setLayout(new BorderLayout());
 				frame.add(new TestPane());
 				frame.pack();
 				frame.setLocationRelativeTo(null);
-//				frame.setVisible(true);
+				start();
 			}
 		});
 	}
 	
 	public void start() {
-		
+		this.frame.setVisible(true);
 	}
 
 	public class TestPane extends JPanel {
@@ -49,8 +54,8 @@ public class Game extends JPanel {
 			setLayout(new GridBagLayout());
 
 			GridBagConstraints gbc = new GridBagConstraints();
-			for (int row = 0; row < 5; row++) {
-				for (int col = 0; col < 5; col++) {
+			for (int row = 0; row < 10; row++) {
+				for (int col = 0; col < 10; col++) {
 					gbc.gridx = col;
 					gbc.gridy = row;
 
@@ -86,6 +91,13 @@ public class Game extends JPanel {
 				public void mouseEntered(MouseEvent e) {
 					defaultBackground = getBackground();
 					setBackground(Color.BLUE);
+				}
+				
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					repaint();
+					setVisible(false);
+					Ctrl.getInstance().start();
 				}
 
 				@Override
