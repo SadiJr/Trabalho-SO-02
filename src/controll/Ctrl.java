@@ -1,9 +1,11 @@
 package controll;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.ThreadLocalRandom;
 
 import model.BallThread;
+import model.Balls;
 import view.Game;
 import view.MainScreen;
 
@@ -15,7 +17,7 @@ public class Ctrl {
 	private Collection<Balls> balls;
 	private TimeController timer;
 	private int tempo;
-	private ArrayList<BallThread> balls;
+	private ArrayList<BallThread> ballst;
 	
 	public Ctrl() {
 		mainScreen = new MainScreen();
@@ -75,7 +77,7 @@ public class Ctrl {
 	}
 	
 	public synchronized void clicked(int x, int y) {
-		for(BallThread ball: balls) {
+		for(BallThread ball: ballst) {
 			
 			if(ball.getX() == x && ball.getY() == y) {
 				Thread t = ball;

@@ -6,6 +6,11 @@ public class Balls extends Thread {
 	private int index;
 	private float speed;
 	
+	public Balls(float speed) {
+		this.setSpeed(speed);
+		this.setIndex(index);
+	}
+	
 	public Balls(float speed, int index) {
 		this.setSpeed(speed);
 		this.setIndex(index);
