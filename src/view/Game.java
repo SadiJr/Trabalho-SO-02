@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -111,5 +112,9 @@ public class Game extends JPanel {
 		public Dimension getPreferredSize() {
 			return new Dimension(50, 50);
 		}
+	}
+
+	public void informMessage(String string) {
+		JOptionPane.showMessageDialog(null, string);
 	}
 }
