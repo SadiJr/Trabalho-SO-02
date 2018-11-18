@@ -122,7 +122,7 @@ public class Game extends JFrame {
 
 	private ActionListener l = new ActionListener() {
 		public void actionPerformed(final ActionEvent e) {
-			Ctrl.getInstance();
+			Ctrl.getInstance().tratarClique((JButton) e.getSource());
 			repaint();
 		}
 	};

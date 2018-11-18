@@ -1,5 +1,6 @@
 package controll;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +17,7 @@ public class Ctrl {
 	private MainScreen mainScreen;
 	private Game game;
 	private int deadBalls;
-	private Collection<Ball> balls;
+	private ArrayList<Ball> balls;
 	private List<JButton> livres;
 	private List<JButton> ocupados;
 	private Timer timer;
@@ -49,7 +50,7 @@ public class Ctrl {
 	}
 	
 	public void facil() {
-		timer.setTimeSec(10);
+		timer.setTimeSec(20);
 		addTimeThreads(2000);
 		game.setDificuldade("Fácil");
 		game.pack();
@@ -117,7 +118,7 @@ public class Ctrl {
 	}
 
 	public void exitGame() {
-		if(deadBalls == 5) {
+		if(deadBalls >= 5) {
 			game.informMessage("Você ganhou!");
 		} else {
 			game.informMessage("Você perdeu!");
@@ -130,6 +131,20 @@ public class Ctrl {
 			ball.interrupt();
 		}
 		timer.interrupt();
+	}
+	
+	public synchronized void tratarClique(JButton b) {
+		for (JButton button : ocupados) {
+			Rectangle bounds = button.getBounds();
+			if(bounds.equals(b.getBounds())) {
+				deadBalls+=1;
+				ocupados.remove(button);
+				livres.add(button);
+				game.removeBolinha(button);
+				balls.get(0).interrupt();
+				return;
+			}
+		}
 	}
 
 }
