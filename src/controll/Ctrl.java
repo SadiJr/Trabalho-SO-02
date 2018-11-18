@@ -2,9 +2,10 @@ package controll;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.List;
 
-import model.BallThread;
+import javax.swing.JButton;
+
 import model.Balls;
 import view.Game;
 import view.MainScreen;
@@ -15,14 +16,18 @@ public class Ctrl {
 	private Game game;
 	private int deadBalls;
 	private Collection<Balls> balls;
+	private List<JButton> livres;
+	private List<JButton> ocupados;
 	private TimeController timer;
 	private int tempo;
-	private ArrayList<BallThread> ballst;
 	
 	public Ctrl() {
 		mainScreen = new MainScreen();
 		game = new Game();
 		balls = new ArrayList<>();
+		criarThreads();
+		livres = game.getButtons();
+		ocupados = new ArrayList<>();
 	}
 	
 	public static Ctrl getInstance() {
@@ -32,26 +37,33 @@ public class Ctrl {
 	public void facil() {
 		timer = new TimeController(120);
 		addTimeThreads(1.5f);
+		game.setDificuldade("Fácil");
+		game.pack();
 		game.setVisible(true);
+		startThreads();
 	}
 
 	public void medio() {
 		timer = new TimeController(60);
 		addTimeThreads(1.0f);
+		game.setDificuldade("Médio");
+		game.pack();
+		game.setVisible(true);
+		startThreads();
 	}
 	
 	public void dificil() {
 		timer = new TimeController(30);
 		addTimeThreads(0.5f);
+		game.setDificuldade("Difícil");
+		game.pack();
+		game.setVisible(true);
+		startThreads();
 	}
 
 	public void start() {
+		mainScreen.pack();
 		mainScreen.setVisible(true);
-		
-		for(int i = 0; i > 5; i++) {
-			Thread t = new BallThread();
-			t.start();
-		}
 	}
 
 	public int getTempo() {
@@ -61,32 +73,42 @@ public class Ctrl {
 	public void setTempo(int tempo) {
 		this.tempo = tempo;
 	}
-
-	public synchronized void move(BallThread ball) {
-		ball.setX(randNumber());
-		ball.setY(randNumber());		
-	}
 	
-	public void addTimeThreads(float speed) {
-		for(Balls ball : this.balls) {
-			ball = new Balls(speed);
+	private void addTimeThreads(float speed) {
+		for (Balls ball : balls) {
+			ball.setSpeed(speed);
 		}
 	}
-	public int randNumber() {
-		return ThreadLocalRandom.current().nextInt(0, 9 + 1);
-	}
 	
-	public synchronized void clicked(int x, int y) {
-		for(BallThread ball: ballst) {
-			
-			if(ball.getX() == x && ball.getY() == y) {
-				Thread t = ball;
-			}
+	private void startThreads() {
+		for (Balls ball : balls) {
+			ball.start();
 		}
 	}
+	
+	private void criarThreads() {
+		for(int i = 0; i < 4; i++) {
+			Balls ball = new Balls(0);
+			balls.add(ball);
+		}
+	}
+	
+	private void inicio() {
+		for(int i = 0; i < 4; i++) {
+			move();
+		}
+	}
+	
 	public synchronized void move() {
-		
-		game.repaint();
+		game.pack();
+		game.setVisible(true);
+		int pos = (int) (Math.random() * livres.size());
+		game.addBolinha(livres.get(pos));
+		ocupados.add(livres.get(pos));
+		JButton jButton = ocupados.get(0);
+		livres.add(jButton);
+		game.removeBolinha(jButton);
+		ocupados.remove(jButton);
 	}
 	
 	private class TimeController extends Thread {

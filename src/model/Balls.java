@@ -26,13 +26,14 @@ public class Balls extends Thread {
 	
 	@Override
 	public void run() {
-		run();
-		Ctrl.getInstance().move();
-		try {
-			sleep((long) speed);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		while(true) {
+			Ctrl.getInstance().move();
+			try {
+				sleep((long) speed);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
