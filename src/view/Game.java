@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -318,6 +319,7 @@ public class Game extends JFrame {
 	
 	public void removeBolinha(JButton button) {
 		button.setIcon(null);
+		repaint();
 	}
 	
 	public void informMessage(String message) {

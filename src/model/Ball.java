@@ -2,16 +2,16 @@ package model;
 
 import controll.Ctrl;
 
-public class Balls extends Thread {
+public class Ball extends Thread {
 	private int index;
 	private float speed;
 	
-	public Balls(float speed) {
+	public Ball(float speed) {
 		this.setSpeed(speed);
 		this.setIndex(index);
 	}
 	
-	public Balls(float speed, int index) {
+	public Ball(float speed, int index) {
 		this.setSpeed(speed);
 		this.setIndex(index);
 	}

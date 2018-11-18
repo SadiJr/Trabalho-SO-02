@@ -6,7 +6,8 @@ import java.util.List;
 
 import javax.swing.JButton;
 
-import model.Balls;
+import model.Ball;
+import model.Timer;
 import view.Game;
 import view.MainScreen;
 
@@ -15,16 +16,17 @@ public class Ctrl {
 	private MainScreen mainScreen;
 	private Game game;
 	private int deadBalls;
-	private Collection<Balls> balls;
+	private Collection<Ball> balls;
 	private List<JButton> livres;
 	private List<JButton> ocupados;
-	private TimeController timer;
+	private Timer timer;
 	private int tempo;
 	
 	public Ctrl() {
 		mainScreen = new MainScreen();
 		game = new Game();
 		balls = new ArrayList<>();
+		timer = new Timer();
 		criarThreads();
 		livres = game.getButtons();
 		ocupados = new ArrayList<>();
@@ -35,8 +37,8 @@ public class Ctrl {
 	}
 	
 	public void facil() {
-		timer = new TimeController(120);
-		addTimeThreads(1.5f);
+		timer.setTimeSec(240);
+		addTimeThreads(2000);
 		game.setDificuldade("Fácil");
 		game.pack();
 		game.setVisible(true);
@@ -44,8 +46,8 @@ public class Ctrl {
 	}
 
 	public void medio() {
-		timer = new TimeController(60);
-		addTimeThreads(1.0f);
+		timer.setTimeSec(120);
+		addTimeThreads(1000);
 		game.setDificuldade("Médio");
 		game.pack();
 		game.setVisible(true);
@@ -53,8 +55,8 @@ public class Ctrl {
 	}
 	
 	public void dificil() {
-		timer = new TimeController(30);
-		addTimeThreads(0.5f);
+		timer.setTimeSec(60);
+		addTimeThreads(000.5f);
 		game.setDificuldade("Difícil");
 		game.pack();
 		game.setVisible(true);
@@ -75,79 +77,37 @@ public class Ctrl {
 	}
 	
 	private void addTimeThreads(float speed) {
-		for (Balls ball : balls) {
+		for (Ball ball : balls) {
 			ball.setSpeed(speed);
 		}
 	}
 	
 	private void startThreads() {
-		for (Balls ball : balls) {
+		for (Ball ball : balls) {
 			ball.start();
 		}
 	}
 	
 	private void criarThreads() {
-		for(int i = 0; i < 4; i++) {
-			Balls ball = new Balls(0);
+		for(int i = 0; i < 5; i++) {
+			Ball ball = new Ball(0);
 			balls.add(ball);
 		}
 	}
 	
-	private void inicio() {
-		for(int i = 0; i < 4; i++) {
-			move();
-		}
-	}
-	
 	public synchronized void move() {
+		int pos = (int) (Math.random() * livres.size());
+		JButton ocupada = livres.get(pos);
+		livres.remove(ocupada);
+		ocupados.add(ocupada);
+		JButton livre = ocupados.get(0);
+		livres.add(livre);
+		ocupados.remove(livre);
+		game.removeBolinha(livre);
+		
 		game.pack();
 		game.setVisible(true);
-		int pos = (int) (Math.random() * livres.size());
-		game.addBolinha(livres.get(pos));
-		ocupados.add(livres.get(pos));
-		JButton jButton = ocupados.get(0);
-		livres.add(jButton);
-		game.removeBolinha(jButton);
-		ocupados.remove(jButton);
-	}
-	
-	private class TimeController extends Thread {
-		private Timer timer;
-		
-		public TimeController(int time) {
-			timer = new Timer(time);
-		}
-		
-		@Override
-		public void run() {
-			timer.run();
-			if(timer.getTime() <= 0) {
-				Ctrl.getInstance().exitGame();
-			}
-		}
-	}
-	
-	private class Timer extends Thread {
-		private int time;
-
-		public Timer(int time) {
-			this.time = time;
-		}
-
-		public int getTime() {
-			return time;
-		}
-		
-		@Override
-		public void run() {
-			this.time--;
-			try {
-				sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		game.addBolinha(ocupada);
 	}
 
 	public void exitGame() {
@@ -156,14 +116,22 @@ public class Ctrl {
 		} else {
 			game.informMessage("Você perdeu!");
 		}
+		killAllThreads();
 	}
-	
+
 	public void killThread(int index) {
-		for(Balls ball : this.balls) {
+		for(Ball ball : this.balls) {
 			if(ball.getIndex() == index) {
 				ball.interrupt();
 			}
 		}
+	}
+	
+	private void killAllThreads() {
+		for (Ball ball : balls) {
+			ball.interrupt();
+		}
+		timer.interrupt();
 	}
 
 }
