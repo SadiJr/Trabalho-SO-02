@@ -3,17 +3,10 @@ package model;
 import controll.Ctrl;
 
 public class Ball extends Thread {
-	private int index;
 	private float speed;
 	
 	public Ball(float speed) {
 		this.setSpeed(speed);
-		this.setIndex(index);
-	}
-	
-	public Ball(float speed, int index) {
-		this.setSpeed(speed);
-		this.setIndex(index);
 	}
 
 	public float getSpeed() {
@@ -26,6 +19,7 @@ public class Ball extends Thread {
 	
 	@Override
 	public void run() {
+		super.run();
 		while(true) {
 			Ctrl.getInstance().move();
 			try {
@@ -36,12 +30,4 @@ public class Ball extends Thread {
 			}
 		}
 	}
-
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
-	}	
 }
