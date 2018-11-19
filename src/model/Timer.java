@@ -9,13 +9,16 @@ import javax.swing.JLabel;
 
 import controll.Ctrl;
 
-public class Timer extends JFrame implements Runnable {
+@SuppressWarnings("serial")
+public class Timer extends JFrame {
 	private int timeSec;
+	private Time t;
 
 	private JLabel jcomp1;
 	private JLabel tempo;
 
 	public Timer() {
+		t = new Time();
 		config();
 	}
 
@@ -40,27 +43,30 @@ public class Timer extends JFrame implements Runnable {
         tempo.setBounds (75, 25, 95, 25);
 	}
 
-	@Override
-	public void run() {
-		while (true) {
-			timeSec--;
-			tempo.setText(""+timeSec);
-			repaint();
-			try {
-				Thread.sleep(1000);
-				verifyTime();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+	public class Time  extends Thread {
+		@Override
+		public void run() {
+			while (!interrupted()) {
+				timeSec--;
+				tempo.setText(""+timeSec);
+				repaint();
+				try {
+					Thread.sleep(1000);
+					verifyTime();
+				} catch (InterruptedException e) {
+					currentThread().interrupt();
+					e.printStackTrace();
+				}
 			}
+	
 		}
-
-	}
-
-	private void verifyTime() {
-		if (timeSec <= 0) {
-			Ctrl.getInstance().exitGame();
+	
+		private void verifyTime() {
+			if (timeSec <= 0) {
+				Ctrl.getInstance().exitGame();
+			}
+	
 		}
-
 	}
 
 	public int getTimeSec() {
@@ -81,4 +87,16 @@ public class Timer extends JFrame implements Runnable {
          int dy = centerPoint.y - windowSize.height / 2;    
          setLocation(dx, dy);
  }
+
+	public void interrupt() {
+		t.interrupt();
+	}
+
+	public void start() {
+		t.start();
+	}
+
+	public void resume() {
+		t.run();
+	}
 }

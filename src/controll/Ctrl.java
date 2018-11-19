@@ -20,6 +20,7 @@ public class Ctrl {
 	private List<JButton> livres;
 	private List<JButton> ocupados;
 	private Timer timer;
+	private boolean novaPartida = true;
 	
 	public Ctrl() {
 		mainScreen = new MainScreen();
@@ -46,27 +47,21 @@ public class Ctrl {
 	}
 	
 	public void facil() {
-		timer.setTimeSec(100);
-		addTimeThreads(2000);
 		game.setDificuldade("Fácil");
 		game.pack();
-		startThreads();
+		startThreads(100, 2000);
 	}
 
 	public void medio() {
-		timer.setTimeSec(50);
-		addTimeThreads(1000);
 		game.setDificuldade("Médio");
 		game.pack();
-		startThreads();
+		startThreads(50, 1000);
 	}
 	
 	public void dificil() {
-		timer.setTimeSec(20);
-		addTimeThreads(500f);
 		game.setDificuldade("Difícil");
 		game.pack();
-		startThreads();
+		startThreads(20, 500);
 	}
 
 	public void start() {
@@ -74,28 +69,32 @@ public class Ctrl {
 		mainScreen.setVisible(true);
 	}
 	
-	private void addTimeThreads(float speed) {
-		for (Ball ball : balls) {
-			ball.setSpeed(speed);
-		}
-	}
-	
-	private void startThreads() {
+	private void startThreads(int seg, float speed) {
 		init();
 		for (Ball ball : balls) {
-			Thread t = new Thread(ball);
-			t.start();
+			if(isNovaPartida()) {
+				ball.setSpeed(speed);
+				ball.start();
+			} else {
+				ball = new Ball(speed);
+				ball.start();
+			}
 		}
-		Thread t = new Thread(timer);
-		t.start();
+		if(isNovaPartida()) {
+			timer.setTimeSec(seg);
+			timer.start();
+		} else {
+			timer = new Timer();
+			timer.setTimeSec(seg);
+			timer.start();
+		}
 		timer.pack();
 		timer.setVisible(true);
 	}
 	
 	private void criarThreads() {
 		for(int i = 0; i < 5; i++) {
-			Ball ball = new Ball(0);
-			balls.add(ball);
+			balls.add(new Ball(0));
 		}
 	}
 	
@@ -114,23 +113,24 @@ public class Ctrl {
 		game.addBolinha(ocupada);
 	}
 
-	public synchronized void exitGame() {
+	public void exitGame() {
 		if(deadBalls >= 5) {
 			game.informMessage("Você ganhou!");
 		} else {
 			game.informMessage("Você perdeu!");
 		}
+		timer.setVisible(false);
 		killAllThreads();
 		limparTela();
+		novaPartida = false;
+		deadBalls = 0;
 	}
 	
-	private synchronized void killAllThreads() {
+	private void killAllThreads() {
 		for (Ball ball : balls) {
-			Thread t = new Thread(ball);
-			t.interrupt();
+			ball.interrupt();
 		}
-		Thread t = new Thread(timer);
-		t.interrupt();
+		timer.interrupt();
 	}
 	
 	public synchronized void tratarClique(JButton b) {
@@ -142,8 +142,7 @@ public class Ctrl {
 					ocupados.remove(button);
 					livres.add(button);
 					game.removeBolinha(button);
-					Thread t = new Thread(balls.get(0));
-					t.interrupt();
+					balls.get(0).interrupt();
 					return;
 				}
 			}
@@ -153,10 +152,17 @@ public class Ctrl {
 	}
 	
 	private void limparTela() {
-		game.limparTela();
-		game.repaint();
-		game.setVisible(false);
+		game = null;
+		game = new Game();
 		mainScreen.setVisible(true);
+	}
+
+	public boolean isNovaPartida() {
+		return novaPartida;
+	}
+
+	public void setNovaPartida(boolean novaPartida) {
+		this.novaPartida = novaPartida;
 	}
 
 }

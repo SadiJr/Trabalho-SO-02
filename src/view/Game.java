@@ -327,12 +327,4 @@ public class Game extends JFrame {
 	public void informMessage(String message) {
 		JOptionPane.showMessageDialog(null, message, "Aviso", JOptionPane.PLAIN_MESSAGE);
 	}
-
-	public void limparTela() {
-		for(JButton b : getButtons()) {
-			b.setIcon(null);
-			repaint();
-		}
-		repaint();
-	}
 }

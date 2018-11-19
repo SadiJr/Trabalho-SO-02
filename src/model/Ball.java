@@ -1,8 +1,10 @@
 package model;
 
+import com.sun.xml.internal.bind.v2.runtime.InlineBinaryTransducer;
+
 import controll.Ctrl;
 
-public class Ball implements Runnable {
+public class Ball extends Thread {
 	private float speed;
 	
 	public Ball(float speed) {
@@ -19,12 +21,12 @@ public class Ball implements Runnable {
 	
 	@Override
 	public void run() {
-		while(!Thread.interrupted()) {
+		while(!interrupted()) {
 			Ctrl.getInstance().move();
 			try {
 				Thread.sleep((long) speed);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				interrupt();
 				e.printStackTrace();
 			}
 		}
