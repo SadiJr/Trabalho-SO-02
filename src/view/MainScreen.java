@@ -40,6 +40,7 @@ public class MainScreen extends JFrame {
 	}
 
 	private void config() {
+		setTitle("Menu");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// construct components
 		dificil = new JButton("Difícil");

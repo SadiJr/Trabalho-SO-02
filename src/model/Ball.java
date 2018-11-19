@@ -2,7 +2,7 @@ package model;
 
 import controll.Ctrl;
 
-public class Ball extends Thread {
+public class Ball implements Runnable {
 	private float speed;
 	
 	public Ball(float speed) {
@@ -19,11 +19,10 @@ public class Ball extends Thread {
 	
 	@Override
 	public void run() {
-		super.run();
-		while(true) {
+		while(!Thread.interrupted()) {
 			Ctrl.getInstance().move();
 			try {
-				sleep((long) speed);
+				Thread.sleep((long) speed);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

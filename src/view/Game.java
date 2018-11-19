@@ -134,6 +134,7 @@ public class Game extends JFrame {
 
 	private void config() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Jogo das bolinhas");
 		pos1 = new JButton();pos3 = new JButton();pos2 = new JButton();pos6 = new JButton();
 		pos9 = new JButton();pos5 = new JButton();pos10 = new JButton();pos7 = new JButton();
 		pos8 = new JButton();pos4 = new JButton();pos12 = new JButton();pos11 = new JButton();
@@ -324,6 +325,14 @@ public class Game extends JFrame {
 	}
 	
 	public void informMessage(String message) {
-		JOptionPane.showMessageDialog(null, message);
+		JOptionPane.showMessageDialog(null, message, "Aviso", JOptionPane.PLAIN_MESSAGE);
+	}
+
+	public void limparTela() {
+		for(JButton b : getButtons()) {
+			b.setIcon(null);
+			repaint();
+		}
+		repaint();
 	}
 }

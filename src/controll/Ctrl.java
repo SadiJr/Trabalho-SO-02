@@ -2,7 +2,6 @@ package controll;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -30,7 +29,6 @@ public class Ctrl {
 		criarThreads();
 		livres = game.getButtons();
 		ocupados = new ArrayList<>();
-		ocupados.add(null);
 	}
 	
 	public static Ctrl getInstance() {
@@ -43,36 +41,31 @@ public class Ctrl {
 			JButton ocupada = livres.get(pos);
 			livres.remove(ocupada);
 			ocupados.add(ocupada);
-			game.pack();
-			game.setVisible(true);
 			game.addBolinha(ocupada);
 		}
 	}
 	
 	public void facil() {
-		timer.setTimeSec(20);
+		timer.setTimeSec(100);
 		addTimeThreads(2000);
 		game.setDificuldade("Fácil");
 		game.pack();
-		game.setVisible(true);
 		startThreads();
 	}
 
 	public void medio() {
-		timer.setTimeSec(120);
+		timer.setTimeSec(50);
 		addTimeThreads(1000);
 		game.setDificuldade("Médio");
 		game.pack();
-		game.setVisible(true);
 		startThreads();
 	}
 	
 	public void dificil() {
-		timer.setTimeSec(60);
+		timer.setTimeSec(20);
 		addTimeThreads(500f);
 		game.setDificuldade("Difícil");
 		game.pack();
-		game.setVisible(true);
 		startThreads();
 	}
 
@@ -90,9 +83,13 @@ public class Ctrl {
 	private void startThreads() {
 		init();
 		for (Ball ball : balls) {
-			ball.start();
+			Thread t = new Thread(ball);
+			t.start();
 		}
-		timer.start();
+		Thread t = new Thread(timer);
+		t.start();
+		timer.pack();
+		timer.setVisible(true);
 	}
 	
 	private void criarThreads() {
@@ -117,34 +114,49 @@ public class Ctrl {
 		game.addBolinha(ocupada);
 	}
 
-	public void exitGame() {
+	public synchronized void exitGame() {
 		if(deadBalls >= 5) {
 			game.informMessage("Você ganhou!");
 		} else {
 			game.informMessage("Você perdeu!");
 		}
 		killAllThreads();
+		limparTela();
 	}
 	
-	private void killAllThreads() {
+	private synchronized void killAllThreads() {
 		for (Ball ball : balls) {
-			ball.interrupt();
+			Thread t = new Thread(ball);
+			t.interrupt();
 		}
-		timer.interrupt();
+		Thread t = new Thread(timer);
+		t.interrupt();
 	}
 	
 	public synchronized void tratarClique(JButton b) {
-		for (JButton button : ocupados) {
-			Rectangle bounds = button.getBounds();
-			if(bounds.equals(b.getBounds())) {
-				deadBalls+=1;
-				ocupados.remove(button);
-				livres.add(button);
-				game.removeBolinha(button);
-				balls.get(0).interrupt();
-				return;
+		if(ocupados.size() > 0) {
+			for (JButton button : ocupados) {
+				Rectangle bounds = button.getBounds();
+				if(bounds.equals(b.getBounds())) {
+					deadBalls+=1;
+					ocupados.remove(button);
+					livres.add(button);
+					game.removeBolinha(button);
+					Thread t = new Thread(balls.get(0));
+					t.interrupt();
+					return;
+				}
 			}
+		} else {
+			exitGame();
 		}
+	}
+	
+	private void limparTela() {
+		game.limparTela();
+		game.repaint();
+		game.setVisible(false);
+		mainScreen.setVisible(true);
 	}
 
 }
