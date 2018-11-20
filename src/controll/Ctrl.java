@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.rowset.spi.SyncResolver;
 import javax.swing.JButton;
 
 import model.Ball;
@@ -21,6 +22,8 @@ public class Ctrl {
 	private List<JButton> ocupados;
 	private Timer timer;
 	private boolean novaPartida = true;
+	private int index = 0;
+	private boolean livre = true;
 	
 	public Ctrl() {
 		mainScreen = new MainScreen();
@@ -31,13 +34,14 @@ public class Ctrl {
 		livres = game.getButtons();
 		ocupados = new ArrayList<>();
 	}
-	
+
 	public static Ctrl getInstance() {
 		return instance;
 	}
-	
+
 	private void init() {
-		for(int i =0; i < 5; i++) {
+		limparTela();
+		for (int i = 0; i < 5; i++) {
 			int pos = (int) (Math.random() * livres.size());
 			JButton ocupada = livres.get(pos);
 			livres.remove(ocupada);
@@ -45,7 +49,7 @@ public class Ctrl {
 			game.addBolinha(ocupada);
 		}
 	}
-	
+
 	public void facil() {
 		game.setDificuldade("Fácil");
 		game.pack();
@@ -57,7 +61,7 @@ public class Ctrl {
 		game.pack();
 		startThreads(50, 1000);
 	}
-	
+
 	public void dificil() {
 		game.setDificuldade("Difícil");
 		game.pack();
@@ -68,92 +72,115 @@ public class Ctrl {
 		mainScreen.pack();
 		mainScreen.setVisible(true);
 	}
-	
-	private void startThreads(int seg, float speed) {
+
+	private synchronized void startThreads(int seg, float speed) {
 		init();
+		System.out.println(balls.size());
 		for (Ball ball : balls) {
-			if(isNovaPartida()) {
+			if (isNovaPartida()) {
 				ball.setSpeed(speed);
 				ball.start();
 			} else {
+				ball.setAlive(false);
+				ball.interrupt();
+				ball = null;
 				ball = new Ball(speed);
 				ball.start();
 			}
 		}
-		if(isNovaPartida()) {
+		if (isNovaPartida()) {
 			timer.setTimeSec(seg);
 			timer.start();
 		} else {
+			timer = null;
 			timer = new Timer();
 			timer.setTimeSec(seg);
 			timer.start();
 		}
 		timer.pack();
 		timer.setVisible(true);
+		game.pack();
+		game.setVisible(true);
 	}
-	
+
 	private void criarThreads() {
-		for(int i = 0; i < 5; i++) {
+		for (int i = 0; i < 5; i++) {
 			balls.add(new Ball(0));
 		}
 	}
-	
+
 	public synchronized void move() {
-		int pos = (int) (Math.random() * livres.size());
-		JButton ocupada = livres.get(pos);
-		livres.remove(ocupada);
-		ocupados.add(ocupada);
-		JButton livre = ocupados.get(0);
-		livres.add(livre);
-		ocupados.remove(livre);
-		game.removeBolinha(livre);
-		
-		game.pack();
-		game.setVisible(true);
-		game.addBolinha(ocupada);
+		if(livre) {
+			livre = false;
+			int pos = (int) (Math.random() * livres.size());
+			JButton ocupada = livres.get(pos);
+			livres.remove(ocupada);
+			ocupados.add(ocupada);
+			JButton livre = ocupados.get(0);
+			livres.add(livre);
+			ocupados.remove(livre);
+			game.removeBolinha(livre);
+			game.addBolinha(ocupada);
+			this.livre = true;
+		}
 	}
 
 	public void exitGame() {
-		if(deadBalls >= 5) {
+		timer.setVisible(false);
+		killAllThreads();
+		cleanBalls();
+		novaPartida = false;
+		index = 0;
+		if (deadBalls >= 5) {
 			game.informMessage("Você ganhou!");
 		} else {
 			game.informMessage("Você perdeu!");
 		}
-		timer.setVisible(false);
-		killAllThreads();
-		limparTela();
-		novaPartida = false;
 		deadBalls = 0;
+		limparTela();
 	}
 	
-	private void killAllThreads() {
+	private void cleanBalls() {
+		for(JButton button : ocupados) {
+			livres.add(button);
+			ocupados.remove(button);
+		}
+	}
+
+	private synchronized void killAllThreads() {
 		for (Ball ball : balls) {
+			ball.setAlive(false);
 			ball.interrupt();
+			
 		}
 		timer.interrupt();
 	}
-	
+
 	public synchronized void tratarClique(JButton b) {
-		if(ocupados.size() > 0) {
+		if(livre) {
+			livre = false;
 			for (JButton button : ocupados) {
 				Rectangle bounds = button.getBounds();
-				if(bounds.equals(b.getBounds())) {
-					deadBalls+=1;
+				if (bounds.equals(b.getBounds())) {
+					deadBalls += 1;
 					ocupados.remove(button);
 					livres.add(button);
 					game.removeBolinha(button);
-					balls.get(0).interrupt();
-					return;
+					balls.get(index).setAlive(false);
+					index++;
+					break;
 				}
 			}
-		} else {
+			livre = true;
+		}
+		if (index >= 5) {
 			exitGame();
 		}
 	}
-	
+
 	private void limparTela() {
-		game = null;
-		game = new Game();
+		game.limparTela();
+		game.setVisible(false);
 		mainScreen.setVisible(true);
 	}
 
@@ -163,6 +190,10 @@ public class Ctrl {
 
 	public void setNovaPartida(boolean novaPartida) {
 		this.novaPartida = novaPartida;
+	}
+	
+	public int getBalls() {
+		return deadBalls;
 	}
 
 }

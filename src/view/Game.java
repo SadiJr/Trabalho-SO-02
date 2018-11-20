@@ -306,6 +306,7 @@ public class Game extends JFrame {
 				.getScaledInstance(pos1.getWidth(), pos1.getHeight(), Image.SCALE_SMOOTH);
 		ImageIcon imageIcon = new ImageIcon(iconLogo);
 		button.setIcon(imageIcon);
+		pack();
 		repaint();
 	}
 	
@@ -320,11 +321,20 @@ public class Game extends JFrame {
 	public void removeBolinha(JButton button) {
 		if(button != null) {
 			button.setIcon(null);
-			repaint();
 		}
+		pack();
+		repaint();
 	}
 	
 	public void informMessage(String message) {
 		JOptionPane.showMessageDialog(null, message, "Aviso", JOptionPane.PLAIN_MESSAGE);
+	}
+
+	public void limparTela() {
+		for(JButton button : getButtons()) {
+			button.setIcon(null);
+		}
+		repaint();
+		pack();
 	}
 }

@@ -1,11 +1,10 @@
 package model;
 
-import com.sun.xml.internal.bind.v2.runtime.InlineBinaryTransducer;
-
 import controll.Ctrl;
 
 public class Ball extends Thread {
 	private float speed;
+	private boolean alive = true;
 	
 	public Ball(float speed) {
 		this.setSpeed(speed);
@@ -21,14 +20,19 @@ public class Ball extends Thread {
 	
 	@Override
 	public void run() {
-		while(!interrupted()) {
+		while(alive) {
 			Ctrl.getInstance().move();
 			try {
 				Thread.sleep((long) speed);
 			} catch (InterruptedException e) {
-				interrupt();
+//				currentThread().interrupt();
+				setAlive(false);
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void setAlive(boolean dead) {
+		this.alive = dead;
 	}
 }

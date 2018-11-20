@@ -95,8 +95,4 @@ public class Timer extends JFrame {
 	public void start() {
 		t.start();
 	}
-
-	public void resume() {
-		t.run();
-	}
 }
