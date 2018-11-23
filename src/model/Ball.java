@@ -26,12 +26,10 @@ public class Ball extends Thread {
 			try {
 				Thread.sleep((long) speed);
 			} catch (InterruptedException e) {
-//				currentThread().interrupt();
 				setAlive(false);
-//				e.printStackTrace();
 			}
 		}
-		System.out.println("Eu morriiiiii!");
+		System.out.println("Thread " + currentThread().getName() + " morreu");
 	}
 	
 	public void setAlive(boolean dead) {

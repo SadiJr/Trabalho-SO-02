@@ -27,19 +27,16 @@ public class Timer extends JFrame {
 		setTitle("Cronômetro");
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		centerFrame();
-		//construct components
+		
         jcomp1 = new JLabel ("Tempo restante:");
         tempo = new JLabel ("");
 
-        //adjust size and set layout
         setPreferredSize (new Dimension (166, 100));
         setLayout (null);
 
-        //add components
         add (jcomp1);
         add (tempo);
 
-        //set component bounds (only needed by Absolute Positioning)
         jcomp1.setBounds (25, 0, 120, 25);
         tempo.setBounds (75, 25, 95, 25);
 	}
@@ -55,18 +52,17 @@ public class Timer extends JFrame {
 					Thread.sleep(1000);
 					verifyTime();
 				} catch (InterruptedException e) {
-					currentThread().interrupt();
-					e.printStackTrace();
+					setAlive(false);
 				}
 			}
-			System.out.println("Eu, TIMER, morriiiii!");
+			System.out.println("Thread TIMER " + currentThread().getName() + " morreu");
 		}
 	
 		private void verifyTime() {
 			if (timeSec <= 0) {
 				Ctrl.getInstance().exitGame();
+				setAlive(false);
 			}
-	
 		}
 	}
 

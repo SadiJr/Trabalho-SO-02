@@ -4,12 +4,10 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.rowset.spi.SyncResolver;
 import javax.swing.JButton;
 
 import model.Ball;
 import model.Timer;
-import model.Timer.Time;
 import view.Game;
 import view.MainScreen;
 
@@ -85,10 +83,6 @@ public class Ctrl {
 				ball.setSpeed(speed);
 				ball.setAlive(true);
 				new Thread(ball).start();
-//				ball = null;
-//				System.gc();
-//				ball = new Ball(speed);
-//				ball.start();
 			}
 		}
 		timer.setTimeSec(seg);
@@ -126,8 +120,7 @@ public class Ctrl {
 		}
 	}
 
-	public void exitGame() {
-		timer.setVisible(false);
+	public synchronized void exitGame() {
 		killAllThreads();
 		cleanBalls();
 		novaPartida = false;
@@ -141,15 +134,12 @@ public class Ctrl {
 		limparTela();
 	}
 	
-	private void cleanBalls() {
-		for(JButton button : ocupados) {
-			livres.add(button);
-			ocupados.remove(button);
-		}
+	private synchronized void cleanBalls() {
+		livres = game.getButtons();
+		ocupados = new ArrayList<>();
 	}
 
 	private synchronized void killAllThreads() {
-		timer.interrupt();
 		for (Ball ball : balls) {
 			ball.setAlive(false);
 		}
@@ -194,5 +184,4 @@ public class Ctrl {
 	public int getBalls() {
 		return deadBalls;
 	}
-
 }
