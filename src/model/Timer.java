@@ -13,6 +13,7 @@ import controll.Ctrl;
 public class Timer extends JFrame {
 	private int timeSec;
 	private Time t;
+	private boolean alive = true;
 
 	private JLabel jcomp1;
 	private JLabel tempo;
@@ -46,7 +47,7 @@ public class Timer extends JFrame {
 	public class Time  extends Thread {
 		@Override
 		public void run() {
-			while (!interrupted()) {
+			while (getAlive()) {
 				timeSec--;
 				tempo.setText(""+timeSec);
 				repaint();
@@ -58,7 +59,7 @@ public class Timer extends JFrame {
 					e.printStackTrace();
 				}
 			}
-	
+			System.out.println("Eu, TIMER, morriiiii!");
 		}
 	
 		private void verifyTime() {
@@ -89,10 +90,22 @@ public class Timer extends JFrame {
  }
 
 	public void interrupt() {
-		t.interrupt();
+		setAlive(false);
 	}
 
 	public void start() {
 		t.start();
+	}
+
+	public boolean getAlive() {
+		return alive;
+	}
+
+	public void setAlive(boolean alive) {
+		this.alive = alive;
+	}
+
+	public Time getCurrentThread() {
+		return t;
 	}
 }

@@ -4,10 +4,11 @@ import controll.Ctrl;
 
 public class Ball extends Thread {
 	private float speed;
-	private boolean alive = true;
+	private boolean alive;
 	
 	public Ball(float speed) {
 		this.setSpeed(speed);
+		this.alive = true;
 	}
 
 	public float getSpeed() {
@@ -27,12 +28,17 @@ public class Ball extends Thread {
 			} catch (InterruptedException e) {
 //				currentThread().interrupt();
 				setAlive(false);
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 		}
+		System.out.println("Eu morriiiiii!");
 	}
 	
 	public void setAlive(boolean dead) {
 		this.alive = dead;
+	}
+	
+	public boolean getAlive() {
+		return alive;
 	}
 }

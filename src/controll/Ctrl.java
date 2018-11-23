@@ -9,6 +9,7 @@ import javax.swing.JButton;
 
 import model.Ball;
 import model.Timer;
+import model.Timer.Time;
 import view.Game;
 import view.MainScreen;
 
@@ -77,25 +78,25 @@ public class Ctrl {
 		init();
 		System.out.println(balls.size());
 		for (Ball ball : balls) {
-			if (isNovaPartida()) {
+			if (ball.getAlive()) {
 				ball.setSpeed(speed);
 				ball.start();
 			} else {
-				ball.setAlive(false);
-				ball.interrupt();
-				ball = null;
-				ball = new Ball(speed);
-				ball.start();
+				ball.setSpeed(speed);
+				ball.setAlive(true);
+				new Thread(ball).start();
+//				ball = null;
+//				System.gc();
+//				ball = new Ball(speed);
+//				ball.start();
 			}
 		}
-		if (isNovaPartida()) {
-			timer.setTimeSec(seg);
+		timer.setTimeSec(seg);
+		if (timer.getAlive()) {
 			timer.start();
 		} else {
-			timer = null;
-			timer = new Timer();
-			timer.setTimeSec(seg);
-			timer.start();
+			timer.setAlive(true);
+			new Thread(timer.getCurrentThread()).start();
 		}
 		timer.pack();
 		timer.setVisible(true);
@@ -148,12 +149,10 @@ public class Ctrl {
 	}
 
 	private synchronized void killAllThreads() {
+		timer.interrupt();
 		for (Ball ball : balls) {
 			ball.setAlive(false);
-			ball.interrupt();
-			
 		}
-		timer.interrupt();
 	}
 
 	public synchronized void tratarClique(JButton b) {
